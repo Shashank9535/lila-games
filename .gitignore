@@ -1,0 +1,18 @@
+# Raw gameplay telemetry and local working copies must never be published.
+data/
+work/
+*.zip
+*.parquet
+*.nakama-0
+
+# Local tooling / secrets
+.streamlit/secrets.toml
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+# Keep only explicitly useful generated outputs in version control.
+outputs/audit_stats.json
