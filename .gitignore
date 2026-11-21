@@ -13,6 +13,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .DS_Store
+node_modules/
 
 # Keep only explicitly useful generated outputs in version control.
 outputs/audit_stats.json

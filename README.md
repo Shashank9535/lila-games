@@ -16,6 +16,7 @@ match-relative playback, and recorded-coordinate heatmaps.
 
 ```powershell
 py -3.12 -m pip install -r requirements.txt
+node install
 py -3.12 -m unittest discover -s tests -v
 py -3.12 scripts/build_manifest.py --dataset data --output outputs/match_manifest.csv
 py -3.12 -m streamlit run app.py
@@ -24,6 +25,15 @@ py -3.12 -m streamlit run app.py
 This workspace keeps the audited extracted data at `work/player_data`; replace
 `data` above with that path when running locally here. Raw data and ZIP files
 must not be committed.
+
+### Windows Parquet fallback
+
+PyArrow is the normal reader. Some managed Windows hosts block PyArrow's native
+Parquet DLL even when the package is installed. The loader detects that exact
+failure and uses the included `parquetjs-lite` bridge for the *selected match*
+only. Run `npm install` once to enable it; it preserves raw event bytes and raw
+timestamp integers. This fallback is for restricted local hosts, not a
+replacement for PyArrow in normal deployments.
 
 ## Dataset and known limits
 

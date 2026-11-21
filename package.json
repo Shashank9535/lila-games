@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Pure-JavaScript Parquet fallback for restricted Windows environments",
+  "dependencies": {
+    "parquetjs-lite": "0.8.7"
+  }
+}

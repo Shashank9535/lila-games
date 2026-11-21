@@ -13,6 +13,7 @@ from data_pipeline.coordinate_mapper import map_world_position
 from data_pipeline.loader import default_dataset_root, load_events
 from data_pipeline.processor import process_match_events
 from ui.heatmaps import build_heatmap
+from ui.landing import render_landing
 from ui.map_view import build_journey_map, minimap_path
 from ui.metrics import render_metrics
 from ui.sidebar import render_sidebar
@@ -43,19 +44,13 @@ def load_processed_match(dataset_root: str, match_id: str) -> pd.DataFrame:
     return frame
 
 
-def main() -> None:
-    st.set_page_config(page_title="Player Journey Explorer", page_icon="◈", layout="wide")
-    st.markdown("""<style>.stApp {background:#0b1220;} [data-testid='stMetric'] {background:#111827; padding:12px; border-radius:8px;}</style>""", unsafe_allow_html=True)
+def render_dashboard(dataset_root: Path) -> None:
+    if st.sidebar.button("← Back to overview"):
+        st.session_state["view"] = "landing"
+        st.query_params.clear()
+        st.rerun()
     st.title("Player Journey Explorer")
     st.caption("LILA BLACK gameplay telemetry • Level-design analysis • Relative playback time")
-    if not MANIFEST_PATH.exists():
-        st.error("Match manifest is missing. Run scripts/build_manifest.py first.")
-        return
-    dataset_root = default_dataset_root()
-    if not dataset_root.exists():
-        st.error("No local dataset found. Configure data/ or work/player_data before running the app.")
-        return
-
     manifest = load_manifest()
     controls = render_sidebar(st, manifest)
     try:
@@ -106,6 +101,26 @@ def main() -> None:
 
     with st.expander("Selected-match records"):
         st.dataframe(filtered[["user_id", "player_class", "event_name", "relative_t_ms", "x", "y", "z", "in_bounds"]], use_container_width=True)
+
+
+def main() -> None:
+    st.set_page_config(page_title="Player Journey Explorer", page_icon="◈", layout="wide")
+    st.markdown("""<style>.stApp {background:#0b1220;} [data-testid='stMetric'] {background:#111827; padding:12px; border-radius:8px;}</style>""", unsafe_allow_html=True)
+    if not MANIFEST_PATH.exists():
+        st.error("Match manifest is missing. Run scripts/build_manifest.py first.")
+        return
+    dataset_root = default_dataset_root()
+    if not dataset_root.exists():
+        st.error("No local dataset found. Configure data/ or work/player_data before running the app.")
+        return
+
+    # Routing is URL-led rather than session-led: a clean root URL must always
+    # show the landing page, even after a visitor previously explored a match.
+    requested_view = st.query_params.get("view")
+    if requested_view != "dashboard":
+        render_landing(dataset_root)
+    else:
+        render_dashboard(dataset_root)
 
 
 if __name__ == "__main__":
